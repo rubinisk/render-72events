@@ -65,13 +65,14 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
 
   return (
     <article className={`event-card ${isHeroSpotlight ? 'event-card-hero-spotlight' : ''}`}>
-      <Link to={`/event/${id}`} className="event-card-link-overlay" aria-label={`View details for ${name}`}>
+      <div className="event-card-inner">
         <div className="event-card-media">
           {cover_image_url && !imgError ? (
             <img
               src={cover_image_url}
               alt={cover_image_alt || name}
               loading={isFeaturedPriority ? 'eager' : 'lazy'}
+              fetchPriority={isFeaturedPriority ? 'high' : 'auto'}
               decoding="async"
               className="event-card-image"
               onError={() => setImgError(true)}
@@ -124,17 +125,30 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
             )}
           </div>
 
-          <h3 className="event-card-title">{name}</h3>
+          <h3 className="event-card-title">
+            <Link to={`/event/${id}`} className="event-card-title-link">
+              {name}
+            </Link>
+          </h3>
           {blurb && <p className="event-card-blurb">{blurb}</p>}
 
           <div className="event-card-footer">
             <span className="event-card-price">{formattedPrice}</span>
-            <span className="card-cta-arrow" aria-hidden="true">
-              View Event →
-            </span>
+            <Link to={`/event/${id}`} className="card-cta-arrow" aria-label={`View details for ${name}`}>
+              <span>View Event</span>
+              <span aria-hidden="true">→</span>
+            </Link>
           </div>
         </div>
-      </Link>
+      </div>
+
+      {/* Accessible background stretched link for entire card hit-area */}
+      <Link
+        to={`/event/${id}`}
+        className="event-card-stretched-link"
+        aria-hidden="true"
+        tabIndex="-1"
+      />
     </article>
   );
 }

@@ -15,6 +15,7 @@ export function AmbientBackground() {
 
   useEffect(() => {
     const isReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const hasHover = window.matchMedia('(hover: hover)').matches;
 
     // Scroll progress bar
     const handleScroll = () => {
@@ -30,12 +31,15 @@ export function AmbientBackground() {
 
     if (isReduced) return;
 
-    // Pointer light
-    const handlePointerMove = (e) => {
-      document.documentElement.style.setProperty('--cursor-x', `${e.clientX}px`);
-      document.documentElement.style.setProperty('--cursor-y', `${e.clientY}px`);
-    };
-    window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    // Pointer spotlight on desktop
+    let handlePointerMove;
+    if (hasHover) {
+      handlePointerMove = (e) => {
+        document.documentElement.style.setProperty('--cursor-x', `${e.clientX}px`);
+        document.documentElement.style.setProperty('--cursor-y', `${e.clientY}px`);
+      };
+      window.addEventListener('pointermove', handlePointerMove, { passive: true });
+    }
 
     // Intersection observer for section pop-ins
     const observer = new IntersectionObserver(
@@ -47,7 +51,7 @@ export function AmbientBackground() {
           }
         });
       },
-      { threshold: 0.1, rootMargin: '0px 0px -40px' }
+      { threshold: 0.08, rootMargin: '0px 0px -30px' }
     );
 
     const observeSections = () => {
@@ -63,44 +67,34 @@ export function AmbientBackground() {
     };
 
     observeSections();
-    const mutationObserver = new MutationObserver(observeSections);
-    mutationObserver.observe(document.body, { childList: true, subtree: true });
 
-    // 3D Card tilt on cards
-    const tiltCleanups = [];
-    const attachTilt = () => {
-      const cards = document.querySelectorAll('.event-card, .cta-banner-card, .prize-card');
-      cards.forEach((card) => {
-        if (card.dataset.tiltAttached) return;
-        card.dataset.tiltAttached = 'true';
+    // Event-delegated 3D Card tilt on desktop devices with hover
+    let onCardMove;
+    let onCardOut;
+    if (hasHover) {
+      onCardMove = (e) => {
+        const card = e.target.closest('.event-card, .cta-banner-card, .prize-card');
+        if (!card) return;
+        const rect = card.getBoundingClientRect();
+        const x = (e.clientX - rect.left) / rect.width;
+        const y = (e.clientY - rect.top) / rect.height;
+        card.style.setProperty('--card-x', `${x * 100}%`);
+        card.style.setProperty('--card-y', `${y * 100}%`);
+        const rotY = (x - 0.5) * 8;
+        const rotX = -(y - 0.5) * 6;
+        card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-3px)`;
+      };
 
-        const onMove = (e) => {
-          const rect = card.getBoundingClientRect();
-          const x = (e.clientX - rect.left) / rect.width;
-          const y = (e.clientY - rect.top) / rect.height;
-          card.style.setProperty('--card-x', `${x * 100}%`);
-          card.style.setProperty('--card-y', `${y * 100}%`);
-          const rotY = (x - 0.5) * 8;
-          const rotX = -(y - 0.5) * 6;
-          card.style.transform = `perspective(900px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateY(-3px)`;
-        };
-
-        const onLeave = () => {
+      onCardOut = (e) => {
+        const card = e.target.closest('.event-card, .cta-banner-card, .prize-card');
+        if (card && (!e.relatedTarget || !card.contains(e.relatedTarget))) {
           card.style.transform = '';
-        };
+        }
+      };
 
-        card.addEventListener('pointermove', onMove, { passive: true });
-        card.addEventListener('pointerleave', onLeave);
-
-        tiltCleanups.push(() => {
-          card.removeEventListener('pointermove', onMove);
-          card.removeEventListener('pointerleave', onLeave);
-        });
-      });
-    };
-
-    attachTilt();
-    const tiltInterval = setInterval(attachTilt, 1200);
+      document.addEventListener('pointermove', onCardMove, { passive: true });
+      document.addEventListener('pointerout', onCardOut, { passive: true });
+    }
 
     // Button ripple effect
     const handleButtonClick = (e) => {
@@ -118,12 +112,17 @@ export function AmbientBackground() {
 
     return () => {
       window.removeEventListener('scroll', handleScroll);
-      window.removeEventListener('pointermove', handlePointerMove);
+      if (handlePointerMove) {
+        window.removeEventListener('pointermove', handlePointerMove);
+      }
+      if (onCardMove) {
+        document.removeEventListener('pointermove', onCardMove);
+      }
+      if (onCardOut) {
+        document.removeEventListener('pointerout', onCardOut);
+      }
       document.removeEventListener('click', handleButtonClick);
-      clearInterval(tiltInterval);
-      mutationObserver.disconnect();
       observer.disconnect();
-      tiltCleanups.forEach((fn) => fn());
     };
   }, []);
 

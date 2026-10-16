@@ -179,14 +179,17 @@ export function Home() {
             {/* Filter & Search Bar */}
             <div className="filter-controls-panel">
               <div className="search-box">
+                <label htmlFor="search-events-input" className="sr-only">
+                  Search events by name, blurb, or topic
+                </label>
                 <span className="search-icon" aria-hidden="true">🔍</span>
                 <input
+                  id="search-events-input"
                   type="search"
                   className="search-input"
                   placeholder="Search by event name, blurb, or topic..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  aria-label="Search events"
                 />
                 {searchQuery && (
                   <button
