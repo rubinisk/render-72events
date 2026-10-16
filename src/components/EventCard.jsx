@@ -74,9 +74,9 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
     toggleSave(id);
   };
 
-  const optimizedSrc = getOptimizedImageUrl(cover_image_url, 480);
+  const optimizedSrc = getOptimizedImageUrl(cover_image_url, 400);
   const optimizedSrcSet = cover_image_url && cover_image_url.includes('images.pexels.com')
-    ? `${getOptimizedImageUrl(cover_image_url, 480)} 480w, ${getOptimizedImageUrl(cover_image_url, 800)} 800w`
+    ? `${getOptimizedImageUrl(cover_image_url, 400)} 400w, ${getOptimizedImageUrl(cover_image_url, 640)} 640w, ${getOptimizedImageUrl(cover_image_url, 800)} 800w`
     : undefined;
 
   return (
@@ -92,7 +92,7 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
               <img
                 src={optimizedSrc}
                 srcSet={optimizedSrcSet}
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                sizes="(max-width: 640px) calc(100vw - 40px), (max-width: 1024px) 50vw, 380px"
                 alt={cover_image_alt || name}
                 loading={isFeaturedPriority ? 'eager' : 'lazy'}
                 fetchPriority={isFeaturedPriority ? 'high' : 'auto'}
