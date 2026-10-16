@@ -12,6 +12,15 @@
     <link rel="dns-prefetch" href="https://images.pexels.com" />
     <link rel="preload" href="https://render72.pages.dev/api/test/events" as="fetch" crossorigin="anonymous" />
     <script>
+      (function() {
+        try {
+          var saved = localStorage.getItem('render72_theme_mode');
+          var theme = saved || (window.matchMedia && window.matchMedia('(prefers-color-scheme: light)').matches ? 'light' : 'dark');
+          document.documentElement.setAttribute('data-theme', theme);
+          var m = document.querySelector('meta[name="theme-color"]');
+          if (m) m.setAttribute('content', theme === 'light' ? '#f8fafc' : '#090a0f');
+        } catch (e) {}
+      })();
       window.__EVENTS_PROMISE__ = fetch('https://render72.pages.dev/api/test/events', {
         headers: { 'Accept': 'application/json' }
       }).then(function(r) { return r.ok ? r.json() : null; }).catch(function() { return null; });

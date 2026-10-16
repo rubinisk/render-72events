@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react';
 import { BrowserRouter, Routes, Route } from 'react-router-dom';
 import { ErrorBoundary } from './components/ErrorBoundary';
+import { ThemeProvider } from './context/ThemeProvider';
 import { SavedProvider } from './context/SavedProvider';
 import { Navbar } from './components/Navbar';
 import { Footer } from './components/Footer';
@@ -20,9 +21,10 @@ const NotFound = lazy(() =>
 export function App() {
   return (
     <ErrorBoundary>
-      <SavedProvider>
-        <BrowserRouter>
-          <div className="app-shell">
+      <ThemeProvider>
+        <SavedProvider>
+          <BrowserRouter>
+            <div className="app-shell">
             <AmbientBackground />
             <Navbar />
             <div className="app-main-view">
@@ -38,8 +40,9 @@ export function App() {
           </div>
         </BrowserRouter>
       </SavedProvider>
-    </ErrorBoundary>
-  );
+    </ThemeProvider>
+  </ErrorBoundary>
+);
 }
 
 export default App;
