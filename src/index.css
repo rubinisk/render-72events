@@ -229,7 +229,7 @@ a {
   color: var(--text-muted);
   border-radius: var(--radius-full);
   transition: all var(--transition-fast);
-  min-height: 44px;
+  min-height: 48px;
 }
 
 .nav-link:hover,
@@ -259,8 +259,10 @@ a {
 /* Mobile Nav Toggle */
 .mobile-nav-toggle {
   display: none;
-  width: 44px;
-  height: 44px;
+  width: 48px;
+  height: 48px;
+  min-width: 48px;
+  min-height: 48px;
   align-items: center;
   justify-content: center;
   border-radius: var(--radius-sm);
@@ -326,7 +328,8 @@ a {
 
   .nav-link {
     width: 100%;
-    padding: 12px 16px;
+    padding: 12px 18px;
+    min-height: 48px;
     border-radius: var(--radius-sm);
   }
 }
@@ -341,11 +344,11 @@ a {
   gap: 8px;
   font-weight: 600;
   font-size: 0.95rem;
-  padding: 11px 22px;
+  padding: 12px 24px;
   border-radius: var(--radius-md);
   transition: all var(--transition-fast);
   text-decoration: none;
-  min-height: 44px;
+  min-height: 48px;
   text-align: center;
 }
 
