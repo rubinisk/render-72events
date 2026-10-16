@@ -2,6 +2,17 @@ import { useState } from 'react';
 import { Link } from 'react-router-dom';
 import { useSaved } from '../hooks/useSaved';
 
+function getOptimizedImageUrl(url, width = 600) {
+  if (!url || typeof url !== 'string') return url;
+  if (url.includes('images.pexels.com')) {
+    const targetHeight = Math.round((width * 9) / 16);
+    return url
+      .replace(/w=\d+/, `w=${width}`)
+      .replace(/h=\d+/, `h=${targetHeight}`);
+  }
+  return url;
+}
+
 export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight = false }) {
   const [imgError, setImgError] = useState(false);
   const { isSaved, toggleSave } = useSaved();
@@ -63,26 +74,39 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
     toggleSave(id);
   };
 
+  const optimizedSrc = getOptimizedImageUrl(cover_image_url, 480);
+  const optimizedSrcSet = cover_image_url && cover_image_url.includes('images.pexels.com')
+    ? `${getOptimizedImageUrl(cover_image_url, 480)} 480w, ${getOptimizedImageUrl(cover_image_url, 800)} 800w`
+    : undefined;
+
   return (
     <article className={`event-card ${isHeroSpotlight ? 'event-card-hero-spotlight' : ''}`}>
       <div className="event-card-inner">
         <div className="event-card-media">
-          {cover_image_url && !imgError ? (
-            <img
-              src={cover_image_url}
-              alt={cover_image_alt || name}
-              loading={isFeaturedPriority ? 'eager' : 'lazy'}
-              fetchPriority={isFeaturedPriority ? 'high' : 'auto'}
-              decoding="async"
-              className="event-card-image"
-              onError={() => setImgError(true)}
-            />
-          ) : (
-            <div className="event-card-fallback-media" aria-hidden="true">
-              <span className="fallback-category-icon">✦</span>
-              <span className="fallback-category-text">{category || 'Event'}</span>
-            </div>
-          )}
+          <Link
+            to={`/event/${id}`}
+            className="media-image-link"
+            aria-label={`View details for ${name}`}
+          >
+            {cover_image_url && !imgError ? (
+              <img
+                src={optimizedSrc}
+                srcSet={optimizedSrcSet}
+                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 400px"
+                alt={cover_image_alt || name}
+                loading={isFeaturedPriority ? 'eager' : 'lazy'}
+                fetchPriority={isFeaturedPriority ? 'high' : 'auto'}
+                decoding="async"
+                className="event-card-image"
+                onError={() => setImgError(true)}
+              />
+            ) : (
+              <div className="event-card-fallback-media" aria-hidden="true">
+                <span className="fallback-category-icon">✦</span>
+                <span className="fallback-category-text">{category || 'Event'}</span>
+              </div>
+            )}
+          </Link>
 
           <div className="media-overlay-badges">
             {isHeroSpotlight && <span className="badge badge-spotlight">✦ SPOTLIGHT</span>}
@@ -141,14 +165,6 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
           </div>
         </div>
       </div>
-
-      {/* Accessible background stretched link for entire card hit-area */}
-      <Link
-        to={`/event/${id}`}
-        className="event-card-stretched-link"
-        aria-hidden="true"
-        tabIndex="-1"
-      />
     </article>
   );
 }

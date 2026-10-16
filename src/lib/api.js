@@ -107,6 +107,23 @@ async function fetchWithTimeout(url, { signal: externalSignal, timeout = DEFAULT
  * Handles both bare array or { events: [...] }
  */
 export async function fetchEvents({ signal } = {}) {
+  // Use early in-flight promise from index.html if available
+  if (typeof window !== 'undefined' && window.__EVENTS_PROMISE__) {
+    const earlyPromise = window.__EVENTS_PROMISE__;
+    window.__EVENTS_PROMISE__ = null;
+    try {
+      const earlyData = await earlyPromise;
+      if (Array.isArray(earlyData)) {
+        return earlyData;
+      }
+      if (earlyData && Array.isArray(earlyData.events)) {
+        return earlyData.events;
+      }
+    } catch {
+      // Fallback to fresh fetch if early fetch failed
+    }
+  }
+
   const data = await fetchWithTimeout(`${API_BASE}/events`, { signal });
   if (Array.isArray(data)) {
     return data;
