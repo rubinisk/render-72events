@@ -7,7 +7,7 @@ export function Footer() {
     <footer className="site-footer">
       <div className="footer-inner">
         <div className="footer-brand-col">
-          <Link to="/" className="site-logo" aria-label="Render72 Events Home">
+          <Link to="/" className="site-logo">
             <span className="logo-spark" aria-hidden="true">✦</span>
             <span className="logo-text">Render<strong>72</strong></span>
             <span className="logo-badge">CAMPUS</span>

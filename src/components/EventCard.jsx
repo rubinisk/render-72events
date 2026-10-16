@@ -158,8 +158,9 @@ export function EventCard({ event, isFeaturedPriority = false, isHeroSpotlight =
 
           <div className="event-card-footer">
             <span className="event-card-price">{formattedPrice}</span>
-            <Link to={`/event/${id}`} className="card-cta-arrow" aria-label={`View details for ${name}`}>
+            <Link to={`/event/${id}`} className="card-cta-arrow">
               <span>View Event</span>
+              <span className="sr-only"> details for {name}</span>
               <span aria-hidden="true">→</span>
             </Link>
           </div>

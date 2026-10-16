@@ -17,7 +17,7 @@ export function Navbar() {
       </a>
       <header className="site-header">
         <div className="header-inner">
-          <Link to="/" className="site-logo" onClick={closeMenu} aria-label="Render72 Events Home">
+          <Link to="/" className="site-logo" onClick={closeMenu}>
             <span className="logo-spark" aria-hidden="true">✦</span>
             <span className="logo-text">Render<strong>72</strong></span>
             <span className="logo-badge">CAMPUS</span>
